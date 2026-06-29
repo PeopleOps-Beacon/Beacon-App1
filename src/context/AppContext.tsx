@@ -1,17 +1,20 @@
 import { type ReactNode, useEffect, useMemo, useReducer } from "react";
 import { airports, defaultAirport } from "../data/airports";
+import { airportConditions } from "../data/enterprise";
 import { travelerModes } from "../data/travelerModes";
 import { analytics } from "../services/analytics";
-import { createMockNotifications } from "../services/notifications";
+import { createSmartNotifications } from "../services/notifications";
 import { readStoredValue, writeStoredValue } from "../services/storage";
 import type {
   AirportConfig,
   AirportLocation,
+  MapLayerId,
   OperationsState,
+  RoutePreference,
   TravelerModeId,
   UserPreferences
 } from "../types";
-import { createGraphRoute } from "../utils/pathfinder";
+import { createRouteOptions } from "../utils/smartRouting";
 import { AppContext, type AppContextValue, type AppState } from "./appContextValue";
 
 type StoredPlatformState = {
@@ -19,6 +22,9 @@ type StoredPlatformState = {
   travelerModeId: TravelerModeId;
   favoriteDestinationIds: string[];
   pinnedDestinationIds: string[];
+  selectedRoutePreference: RoutePreference;
+  activeMapLayers: MapLayerId[];
+  dismissedNotificationIds: string[];
   preferences: UserPreferences;
 };
 
@@ -28,6 +34,9 @@ type AppAction =
   | { type: "select-destination"; destination: AirportLocation }
   | { type: "clear-destination" }
   | { type: "arrive" }
+  | { type: "select-route-preference"; preference: RoutePreference }
+  | { type: "toggle-map-layer"; layerId: MapLayerId }
+  | { type: "dismiss-notification"; notificationId: string }
   | { type: "toggle-favorite"; destinationId: string }
   | { type: "toggle-pinned"; destinationId: string }
   | { type: "set-operations"; operations: OperationsState }
@@ -48,10 +57,16 @@ const defaultPreferences: UserPreferences = {
   largeText: false,
   theme: "dark",
   preferredWalkingSpeed: "standard",
+  preferredRouteType: "fastest",
+  favoriteCategories: [],
+  defaultAirportId: defaultAirport.id,
   accessibilityNeeds: [],
   sensorySensitivity: "medium",
   preferredLanguage: "en",
-  notificationsEnabled: true
+  notificationsEnabled: true,
+  voiceGuidanceEnabled: true,
+  voiceVolume: 0.8,
+  voiceRate: 1
 };
 
 function getInitialAirport(storedAirportId: string): AirportConfig {
@@ -71,9 +86,13 @@ function readInitialState(): AppState {
     travelerModeId: "veteran",
     favoriteDestinationIds: [],
     pinnedDestinationIds: [],
+    selectedRoutePreference: "fastest",
+    activeMapLayers: ["restrooms", "accessibility", "security"],
+    dismissedNotificationIds: [],
     preferences: defaultPreferences
   });
   const airport = getInitialAirport(stored.airportId);
+  const conditions = getAirportConditions(airport.id);
 
   return {
     airportId: airport.id,
@@ -81,8 +100,12 @@ function readInitialState(): AppState {
     selectedDestination: null,
     currentLocation: getCurrentLocation(airport),
     recentSearches: [],
-    favoriteDestinationIds: stored.favoriteDestinationIds,
-    pinnedDestinationIds: stored.pinnedDestinationIds,
+    favoriteDestinationIds: stored.favoriteDestinationIds ?? [],
+    pinnedDestinationIds: stored.pinnedDestinationIds ?? [],
+    selectedRoutePreference: stored.selectedRoutePreference ?? "fastest",
+    routeOptions: [],
+    activeMapLayers: stored.activeMapLayers ?? ["restrooms", "accessibility", "security"],
+    conditions,
     navigation: {
       route: null,
       isNavigating: false,
@@ -91,13 +114,23 @@ function readInitialState(): AppState {
     preferences: { ...defaultPreferences, ...stored.preferences },
     operations: defaultOperations,
     activeSettingsPanel: false,
-    notifications: createMockNotifications(airport.iata)
+    notifications: createSmartNotifications(airport, conditions, [], stored.travelerModeId).filter(
+      (notification) => !stored.dismissedNotificationIds.includes(notification.id)
+    )
   };
 }
 
 function withRoute(state: AppState, destination: AirportLocation, modeId = state.travelerModeId): AppState {
   const airport = getInitialAirport(state.airportId);
-  const route = createGraphRoute(airport.locations, state.currentLocation, destination, modeId);
+  const routeOptions = createRouteOptions(
+    airport.locations,
+    state.currentLocation,
+    destination,
+    modeId,
+    state.conditions
+  );
+  const selectedRoute =
+    routeOptions.find((option) => option.preference === state.selectedRoutePreference) ?? routeOptions[0];
 
   analytics.track("navigation_started", {
     airport: airport.iata,
@@ -113,8 +146,12 @@ function withRoute(state: AppState, destination: AirportLocation, modeId = state
       destination,
       ...state.recentSearches.filter((location) => location.id !== destination.id)
     ].slice(0, 6),
+    routeOptions,
+    notifications: createSmartNotifications(airport, state.conditions, routeOptions, modeId).filter(
+      (notification) => !state.notifications.some((existing) => existing.id === notification.id && existing.dismissed)
+    ),
     navigation: {
-      route,
+      route: selectedRoute,
       isNavigating: true,
       hasArrived: false
     }
@@ -125,18 +162,25 @@ function toggleId(ids: string[], id: string): string[] {
   return ids.includes(id) ? ids.filter((value) => value !== id) : [id, ...ids].slice(0, 12);
 }
 
+function getAirportConditions(airportId: string) {
+  return airportConditions.filter((condition) => condition.airportId === airportId);
+}
+
 function reducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case "set-airport": {
       analytics.track("airport_changed", { airport: action.airport.iata });
+      const conditions = getAirportConditions(action.airport.id);
       return {
         ...state,
         airportId: action.airport.id,
         currentLocation: getCurrentLocation(action.airport),
         selectedDestination: null,
         recentSearches: [],
+        routeOptions: [],
+        conditions,
         navigation: { route: null, isNavigating: false, hasArrived: false },
-        notifications: createMockNotifications(action.airport.iata)
+        notifications: createSmartNotifications(action.airport, conditions, [], state.travelerModeId)
       };
     }
     case "set-traveler-mode": {
@@ -157,6 +201,7 @@ function reducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         selectedDestination: null,
+        routeOptions: [],
         navigation: { route: null, isNavigating: false, hasArrived: false }
       };
     case "arrive":
@@ -170,6 +215,36 @@ function reducer(state: AppState, action: AppAction): AppState {
           isNavigating: false,
           hasArrived: true
         }
+      };
+    case "select-route-preference": {
+      analytics.track("route_type_selected", { preference: action.preference });
+      const route =
+        state.routeOptions.find((option) => option.preference === action.preference) ??
+        state.navigation.route;
+      return {
+        ...state,
+        selectedRoutePreference: action.preference,
+        preferences: { ...state.preferences, preferredRouteType: action.preference },
+        navigation: route ? { ...state.navigation, route } : state.navigation
+      };
+    }
+    case "toggle-map-layer":
+      analytics.track("map_layer_toggled", { layer: action.layerId });
+      return {
+        ...state,
+        activeMapLayers: state.activeMapLayers.includes(action.layerId)
+          ? state.activeMapLayers.filter((layerId) => layerId !== action.layerId)
+          : [...state.activeMapLayers, action.layerId]
+      };
+    case "dismiss-notification":
+      analytics.track("notification_dismissed", { notificationId: action.notificationId });
+      return {
+        ...state,
+        notifications: state.notifications.map((notification) =>
+          notification.id === action.notificationId
+            ? { ...notification, dismissed: true }
+            : notification
+        )
       };
     case "toggle-favorite":
       analytics.track("favorite_toggled", { destinationId: action.destinationId });
@@ -212,12 +287,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       travelerModeId: state.travelerModeId,
       favoriteDestinationIds: state.favoriteDestinationIds,
       pinnedDestinationIds: state.pinnedDestinationIds,
+      selectedRoutePreference: state.selectedRoutePreference,
+      activeMapLayers: state.activeMapLayers,
+      dismissedNotificationIds: state.notifications
+        .filter((notification) => notification.dismissed)
+        .map((notification) => notification.id),
       preferences: state.preferences
     });
   }, [
     state.airportId,
     state.favoriteDestinationIds,
+    state.activeMapLayers,
+    state.notifications,
     state.pinnedDestinationIds,
+    state.selectedRoutePreference,
     state.preferences,
     state.travelerModeId
   ]);
@@ -241,6 +324,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       selectDestination: (destination) => dispatch({ type: "select-destination", destination }),
       clearDestination: () => dispatch({ type: "clear-destination" }),
       markArrived: () => dispatch({ type: "arrive" }),
+      selectRoutePreference: (preference) =>
+        dispatch({ type: "select-route-preference", preference }),
+      toggleMapLayer: (layerId) => dispatch({ type: "toggle-map-layer", layerId }),
+      dismissNotification: (notificationId) =>
+        dispatch({ type: "dismiss-notification", notificationId }),
       toggleFavorite: (destinationId) => dispatch({ type: "toggle-favorite", destinationId }),
       togglePinned: (destinationId) => dispatch({ type: "toggle-pinned", destinationId }),
       setOperations: (operations) => dispatch({ type: "set-operations", operations }),

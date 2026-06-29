@@ -59,6 +59,35 @@ Status: implemented on `sprint-3-platform-pilot-readiness`.
 
 ## Sprint 4 Candidates
 
+## Sprint 4 - Enterprise Features & Smart Guidance
+
+Status: implemented on `sprint-4-enterprise-smart-guidance`.
+
+### Built
+
+- Smart route comparison for fastest, accessible, quietest, family, least walking, fewest elevators, fewest stairs, and wheelchair-optimized route options.
+- Simulated airport operations conditions that influence route warnings and smart notifications.
+- Contextual notification engine with priority, mode targeting, dismissal, and history-ready metadata.
+- Mock flight information module with flight search, detail state, and future API-ready service boundary.
+- Personalized dashboard, emergency assistance shortcuts, services directory, alerts center, map layer toggles, voice guidance queue, admin configuration panel, diagnostics, and feature flags.
+- Multilingual resource dictionaries for English, Spanish, French, German, and Japanese.
+- API client abstraction with caching, retries, typed results, and error path.
+- Expanded settings for route preference, language, voice guidance, theme, accessibility, notifications, walking speed, and sensory sensitivity.
+
+### Architectural Decisions
+
+- Smart routing wraps the existing graph route contract with route scoring, route difficulty, accessibility score, and condition warnings.
+- API, analytics, notification, diagnostics, voice, and enterprise data access are separate services so Sprint 5 can connect production providers with minimal UI churn.
+- Admin configuration is data-driven and read-only for this sprint, preserving a safe pilot demonstration surface.
+
+### Known Limitations
+
+- Conditions are simulated and not connected to live airport operations feeds.
+- Voice guidance creates a typed queue but does not invoke browser speech synthesis yet.
+- The admin module is read-only and unauthenticated.
+
+## Sprint 5 Candidates
+
 - Replace generated graph edges with real airport indoor graph data.
 - Add real accessibility-safe path constraints, closures, and live route alternatives.
 - Add indoor positioning and Bluetooth beacon data hooks.

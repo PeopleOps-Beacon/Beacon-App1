@@ -1,18 +1,29 @@
+import { AdminConfigPanel } from "./components/AdminConfigPanel";
+import { AlertsCenter } from "./components/AlertsCenter";
 import { AuthPanel } from "./components/AuthPanel";
 import { AirportMap } from "./components/AirportMap";
 import { AirportInfoPanel } from "./components/AirportInfoPanel";
 import { AirportSelector } from "./components/AirportSelector";
 import { BeaconLogo } from "./components/BeaconLogo";
 import { CategoryBrowser } from "./components/CategoryBrowser";
+import { ConditionsPanel } from "./components/ConditionsPanel";
 import { DestinationCard } from "./components/DestinationCard";
+import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
+import { EmergencyPanel } from "./components/EmergencyPanel";
+import { EnterpriseDashboard } from "./components/EnterpriseDashboard";
 import { FavoritesPanel } from "./components/FavoritesPanel";
+import { FlightWidget } from "./components/FlightWidget";
+import { MapLayerToggles } from "./components/MapLayerToggles";
 import { NavigationPanel } from "./components/NavigationPanel";
 import { NotificationCenter } from "./components/NotificationCenter";
 import { OfflineStatus } from "./components/OfflineStatus";
 import { OperationsPanel } from "./components/OperationsPanel";
 import { SearchBar } from "./components/SearchBar";
+import { RouteComparison } from "./components/RouteComparison";
+import { ServicesDirectory } from "./components/ServicesDirectory";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { TravelerModeSelector } from "./components/TravelerModeSelector";
+import { VoiceGuidancePanel } from "./components/VoiceGuidancePanel";
 import { AppProvider } from "./context/AppContext";
 import { travelerModes } from "./data/travelerModes";
 import { useAppContext } from "./hooks/useAppContext";
@@ -29,11 +40,14 @@ export function App() {
 function BeaconWorkspace() {
   const {
     activeMode,
+    activeMapLayers,
     activeSettingsPanel,
     airport,
     airports,
     clearDestination,
+    conditions,
     currentLocation,
+    dismissNotification,
     favoriteDestinationIds,
     favoriteDestinations,
     locations,
@@ -45,13 +59,17 @@ function BeaconWorkspace() {
     preferences,
     recentSearches,
     resetPreferences,
+    routeOptions,
     selectedDestination,
+    selectedRoutePreference,
+    selectRoutePreference,
     selectDestination,
     setAirport,
     setOperations,
     setPreferences,
     setSettingsOpen,
     setTravelerMode,
+    toggleMapLayer,
     toggleFavorite,
     togglePinned,
     travelerModeId
@@ -88,7 +106,15 @@ function BeaconWorkspace() {
               recentSearches={recentSearches}
               travelerMode={travelerModeId}
             />
+            <EnterpriseDashboard
+              airport={airport}
+              favorites={favoriteDestinations}
+              mode={activeMode}
+              notifications={notifications}
+              recents={recentSearches}
+            />
             <CategoryBrowser locations={locations} onSelect={selectDestination} />
+            <EmergencyPanel locations={locations} onSelect={selectDestination} />
             <FavoritesPanel
               favorites={favoriteDestinations}
               onSelect={selectDestination}
@@ -105,7 +131,17 @@ function BeaconWorkspace() {
               route={navigation.route}
               selectedDestination={selectedDestination}
             />
+            <MapLayerToggles activeLayers={activeMapLayers} onToggle={toggleMapLayer} />
+            <RouteComparison
+              onSelect={selectRoutePreference}
+              options={routeOptions}
+              selectedPreference={selectedRoutePreference}
+            />
             <NavigationPanel mode={activeMode} navigation={navigation} onArrive={markArrived} />
+            <VoiceGuidancePanel preferences={preferences} route={navigation.route} />
+            <ConditionsPanel conditions={conditions} />
+            <FlightWidget />
+            <ServicesDirectory airport={airport} onSelect={selectDestination} />
             <AirportInfoPanel airport={airport} />
           </div>
 
@@ -121,6 +157,7 @@ function BeaconWorkspace() {
               onTogglePinned={togglePinned}
               route={navigation.route}
             />
+            <AlertsCenter airport={airport} />
             <SettingsPanel
               isOpen={activeSettingsPanel}
               onChange={setPreferences}
@@ -129,9 +166,12 @@ function BeaconWorkspace() {
               preferences={preferences}
             />
             <NotificationCenter
+              onDismiss={dismissNotification}
               enabled={preferences.notificationsEnabled}
               notifications={notifications}
             />
+            <AdminConfigPanel airport={airport} />
+            <DiagnosticsPanel />
             <OfflineStatus airport={airport} />
             <AuthPanel />
             <OperationsPanel operations={operations} onChange={setOperations} />

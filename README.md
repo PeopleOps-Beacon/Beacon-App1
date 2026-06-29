@@ -16,6 +16,7 @@ The current build supports multi-airport pilot configuration, searchable termina
 - Persisted traveler preferences, themes, reduced motion, large text, high contrast, notifications, favorites, and pinned destinations.
 - Firebase-ready account access in preview mode.
 - Local analytics, mock notifications, and offline manifest helpers.
+- Smart route comparison, simulated airport conditions, mock flights, services directory, emergency assistance, map layers, voice guidance scaffolding, and admin configuration summary.
 
 ## Setup
 
@@ -38,6 +39,9 @@ Use these checks before deployment:
 - `ARCHITECTURE.md`: platform architecture and data flow.
 - `COMPONENTS.md`: reusable UI and feature component guide.
 - `CONTRIBUTING.md`: local development and quality expectations.
+- `API.md`: mock API client and future integration boundary.
+- `SERVICES.md`: service abstraction guide.
+- `ADMIN_CONFIGURATION.md`: admin configuration scope and future editing model.
 
 ## Security Notes
 

@@ -1,12 +1,14 @@
 import { Bell } from "lucide-react";
-import type { NotificationItem } from "../types";
+import type { SmartNotification } from "../types";
 
 export function NotificationCenter({
   enabled,
-  notifications
+  notifications,
+  onDismiss
 }: {
   enabled: boolean;
-  notifications: NotificationItem[];
+  notifications: SmartNotification[];
+  onDismiss: (notificationId: string) => void;
 }) {
   return (
     <section className="notification-center" aria-labelledby="notification-title">
@@ -19,10 +21,16 @@ export function NotificationCenter({
       </div>
       {!enabled ? <p>Notifications are off in traveler settings.</p> : null}
       {enabled
-        ? notifications.map((notification) => (
+        ? notifications
+            .filter((notification) => !notification.dismissed)
+            .map((notification) => (
             <article className={`notification ${notification.tone}`} key={notification.id}>
               <strong>{notification.title}</strong>
               <p>{notification.body}</p>
+              <small>{notification.priority} priority</small>
+              <button onClick={() => onDismiss(notification.id)} type="button">
+                Dismiss
+              </button>
             </article>
           ))
         : null}

@@ -18,6 +18,16 @@
 - `AirportInfoPanel`: configuration-powered airport information screens.
 - `NotificationCenter`: mock notification architecture for pilot alerts.
 - `OfflineStatus`: local offline-readiness status.
+- `RouteComparison`: compares smart route options before navigation.
+- `ConditionsPanel`: shows simulated live operations conditions.
+- `FlightWidget`: mock flight search and detail display.
+- `EmergencyPanel`: rapid access to emergency/support destinations.
+- `ServicesDirectory`: searchable airport services with navigate actions.
+- `AlertsCenter`: airport alert display.
+- `MapLayerToggles`: independent overlay controls.
+- `VoiceGuidancePanel`: mock spoken-instruction queue.
+- `AdminConfigPanel`: data-driven administrative configuration summary.
+- `DiagnosticsPanel`: feature flags and local analytics visibility.
 
 ## Component Standards
 

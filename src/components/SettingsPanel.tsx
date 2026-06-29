@@ -1,4 +1,4 @@
-import { Bell, Eye, Settings, ShieldCheck, Type } from "lucide-react";
+import { Bell, Eye, Languages, Navigation, Settings, ShieldCheck, Type, Volume2 } from "lucide-react";
 import type { ReactNode } from "react";
 import type { UserPreferences } from "../types";
 import { Button } from "./ui/Button";
@@ -42,6 +42,24 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
             </select>
           </label>
           <label>
+            Route preference
+            <select
+              onChange={(event) =>
+                onChange({
+                  preferredRouteType: event.target.value as UserPreferences["preferredRouteType"]
+                })
+              }
+              value={preferences.preferredRouteType}
+            >
+              <option value="fastest">Fastest</option>
+              <option value="accessible">Most accessible</option>
+              <option value="quietest">Quietest</option>
+              <option value="family">Family friendly</option>
+              <option value="least-walking">Least walking</option>
+              <option value="wheelchair">Wheelchair optimized</option>
+            </select>
+          </label>
+          <label>
             Walking speed
             <select
               onChange={(event) =>
@@ -54,6 +72,23 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
               <option value="slow">Slow</option>
               <option value="standard">Standard</option>
               <option value="fast">Fast</option>
+            </select>
+          </label>
+          <label>
+            Language
+            <select
+              onChange={(event) =>
+                onChange({
+                  preferredLanguage: event.target.value as UserPreferences["preferredLanguage"]
+                })
+              }
+              value={preferences.preferredLanguage}
+            >
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="ja">Japanese</option>
             </select>
           </label>
           <label>
@@ -71,6 +106,12 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
               <option value="high">High</option>
             </select>
           </label>
+          <Toggle
+            checked={preferences.voiceGuidanceEnabled}
+            icon={<Volume2 aria-hidden="true" />}
+            label="Voice guidance"
+            onChange={(value) => onChange({ voiceGuidanceEnabled: value })}
+          />
           <Toggle
             checked={preferences.highContrast}
             icon={<Eye aria-hidden="true" />}
@@ -95,6 +136,10 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
             label="Mock notifications"
             onChange={(value) => onChange({ notificationsEnabled: value })}
           />
+          <p className="settings-note">
+            <Navigation aria-hidden="true" /> Smart routes and <Languages aria-hidden="true" /> translations
+            are configured locally for pilot demos.
+          </p>
           <Button onClick={onReset} variant="ghost">
             Reset preferences
           </Button>

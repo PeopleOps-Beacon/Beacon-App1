@@ -32,3 +32,12 @@ flowchart LR
 - Replace local storage with authenticated cloud sync.
 - Register a production service worker for offline maps and search.
 - Connect analytics and notification services to approved providers.
+
+## Sprint 4 Enterprise Additions
+
+- `src/utils/smartRouting.ts`: route-option scoring and condition-aware recommendations.
+- `src/services/apiClient.ts`: API abstraction with cache and retry support.
+- `src/services/enterpriseServices.ts`: mock airport, flight, alert, and directory service facade.
+- `src/services/notifications.ts`: contextual notification generation.
+- `src/services/voice.ts`: text-to-speech queue scaffolding.
+- `src/data/enterprise.ts`: route labels, map layers, conditions, flights, alerts, services, translations, and feature flags.

@@ -469,6 +469,7 @@ input[type="range"] {
 .destination-card,
 .map-panel,
 .navigation-panel,
+.enterprise-panel,
 .airport-selector,
 .settings-panel,
 .favorites-panel,
@@ -487,6 +488,7 @@ input[type="range"] {
 .destination-card,
 .map-panel,
 .navigation-panel,
+.enterprise-panel,
 .airport-selector,
 .settings-panel,
 .favorites-panel,
@@ -670,6 +672,163 @@ input[type="range"] {
 
 .notification p {
   margin-bottom: 0;
+}
+
+.enterprise-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.dashboard-grid,
+.admin-grid,
+.route-stats {
+  display: grid;
+  gap: 10px;
+}
+
+.dashboard-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.dashboard-grid span,
+.admin-grid div,
+.flag-list span {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #dbe7f4;
+  font-weight: 800;
+  padding: 10px;
+  background: #101821;
+}
+
+.route-option-list,
+.condition-list,
+.flight-list,
+.service-list,
+.alert-list,
+.voice-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.route-option,
+.flight-list button,
+.emergency-grid button {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e7eef7;
+  display: grid;
+  gap: 4px;
+  min-height: 58px;
+  padding: 10px 12px;
+  text-align: left;
+  background: #101821;
+}
+
+.route-option.active {
+  border-color: #f5b72f;
+  box-shadow: inset 4px 0 0 #f5b72f;
+}
+
+.route-option small,
+.flight-list span,
+.service-list small,
+.alert-list small {
+  color: #9fb0c3;
+}
+
+.condition,
+.service-list article,
+.alert,
+.flight-detail {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left-width: 4px;
+  border-radius: 8px;
+  padding: 10px;
+  background: #101821;
+}
+
+.condition.high,
+.alert.high,
+.alert.critical {
+  border-left-color: #f87171;
+}
+
+.condition.medium,
+.alert.medium {
+  border-left-color: #f5b72f;
+}
+
+.condition.low,
+.alert.low {
+  border-left-color: #6ee7b7;
+}
+
+.enterprise-input {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  color: #ffffff;
+  min-height: 44px;
+  padding: 0 12px;
+  background: #081018;
+}
+
+.emergency-grid,
+.layer-grid,
+.flag-list {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.emergency-grid button {
+  border-color: rgba(248, 113, 113, 0.5);
+}
+
+.layer-grid label {
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #dbe7f4;
+  display: flex;
+  font-size: 0.82rem;
+  font-weight: 800;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 10px;
+  background: #101821;
+}
+
+.voice-list {
+  color: #dbe7f4;
+  list-style-position: inside;
+}
+
+.notification button,
+.service-list button {
+  border: 0;
+  border-radius: 8px;
+  color: #071014;
+  font-weight: 900;
+  margin-top: 8px;
+  min-height: 34px;
+  padding: 0 10px;
+  background: #ffcf66;
+}
+
+.settings-note {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.settings-note svg {
+  color: #ffcf66;
+  height: 16px;
+  width: 16px;
 }
 
 .search-shell label {
@@ -1051,7 +1210,11 @@ input[type="range"] {
   }
 
   .detail-grid,
-  .route-stats {
+  .route-stats,
+  .dashboard-grid,
+  .emergency-grid,
+  .layer-grid,
+  .flag-list {
     grid-template-columns: 1fr;
   }
 

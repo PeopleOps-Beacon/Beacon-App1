@@ -2,9 +2,13 @@ import { createContext } from "react";
 import type {
   AirportConfig,
   AirportLocation,
-  NotificationItem,
+  AirportCondition,
+  MapLayerId,
   NavigationState,
   OperationsState,
+  RouteOption,
+  RoutePreference,
+  SmartNotification,
   TravelerMode,
   TravelerModeId,
   UserPreferences
@@ -18,11 +22,15 @@ export type AppState = {
   recentSearches: AirportLocation[];
   favoriteDestinationIds: string[];
   pinnedDestinationIds: string[];
+  selectedRoutePreference: RoutePreference;
+  routeOptions: RouteOption[];
+  activeMapLayers: MapLayerId[];
+  conditions: AirportCondition[];
   navigation: NavigationState;
   preferences: UserPreferences;
   operations: OperationsState;
   activeSettingsPanel: boolean;
-  notifications: NotificationItem[];
+  notifications: SmartNotification[];
 };
 
 export type AppContextValue = AppState & {
@@ -37,6 +45,9 @@ export type AppContextValue = AppState & {
   selectDestination: (destination: AirportLocation) => void;
   clearDestination: () => void;
   markArrived: () => void;
+  selectRoutePreference: (preference: RoutePreference) => void;
+  toggleMapLayer: (layerId: MapLayerId) => void;
+  dismissNotification: (notificationId: string) => void;
   toggleFavorite: (destinationId: string) => void;
   togglePinned: (destinationId: string) => void;
   setOperations: (operations: OperationsState) => void;
