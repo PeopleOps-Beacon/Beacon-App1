@@ -3,6 +3,7 @@ import {
   Baby,
   BriefcaseBusiness,
   EarOff,
+  Languages,
   Shield
 } from "lucide-react";
 import type { TravelerMode } from "../types";
@@ -47,5 +48,13 @@ export const travelerModes: TravelerMode[] = [
     routeIntent: "Fast transfer",
     accent: "#67e8f9",
     icon: BriefcaseBusiness
+  },
+  {
+    id: "international",
+    label: "International",
+    description: "Customs reminders, passport-ready prompts, and clear transfer sequencing.",
+    routeIntent: "Customs-aware route",
+    accent: "#c4b5fd",
+    icon: Languages
   }
 ];

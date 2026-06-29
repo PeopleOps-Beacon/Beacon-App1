@@ -17,7 +17,24 @@ describe("Beacon OS", () => {
 
     await user.click(screen.getByRole("button", { name: /sensory/i }));
 
-    expect(screen.getByRole("heading", { name: /noise reduced/i })).toBeInTheDocument();
-    expect(screen.getByText(/lower noise exposure/i)).toBeInTheDocument();
+    await user.type(screen.getByRole("combobox", { name: /find a destination/i }), "quiet");
+    await user.click(screen.getByRole("option", { name: /quiet room/i }));
+
+    expect(screen.getByText(/lower-noise route selected/i)).toBeInTheDocument();
+  });
+
+  it("selects a destination and starts mock navigation", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.type(screen.getByRole("combobox", { name: /find a destination/i }), "gate a7");
+    await user.keyboard("{Enter}");
+
+    expect(screen.getByRole("heading", { name: /^gate a7$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /route to gate a7/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /mark arrived/i }));
+
+    expect(screen.getByText(/arrival confirmed/i)).toBeInTheDocument();
   });
 });
