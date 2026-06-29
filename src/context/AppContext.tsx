@@ -1,22 +1,39 @@
-import { type ReactNode, useMemo, useReducer } from "react";
-import { currentLocation, locations } from "../data/locations";
+import { type ReactNode, useEffect, useMemo, useReducer } from "react";
+import { airports, defaultAirport } from "../data/airports";
 import { travelerModes } from "../data/travelerModes";
-import { AppContext, type AppContextValue, type AppState } from "./appContextValue";
+import { analytics } from "../services/analytics";
+import { createMockNotifications } from "../services/notifications";
+import { readStoredValue, writeStoredValue } from "../services/storage";
 import type {
+  AirportConfig,
   AirportLocation,
   OperationsState,
   TravelerModeId,
   UserPreferences
 } from "../types";
-import { createRoute } from "../utils/navigation";
+import { createGraphRoute } from "../utils/pathfinder";
+import { AppContext, type AppContextValue, type AppState } from "./appContextValue";
+
+type StoredPlatformState = {
+  airportId: string;
+  travelerModeId: TravelerModeId;
+  favoriteDestinationIds: string[];
+  pinnedDestinationIds: string[];
+  preferences: UserPreferences;
+};
 
 type AppAction =
+  | { type: "set-airport"; airport: AirportConfig }
   | { type: "set-traveler-mode"; modeId: TravelerModeId }
   | { type: "select-destination"; destination: AirportLocation }
   | { type: "clear-destination" }
   | { type: "arrive" }
+  | { type: "toggle-favorite"; destinationId: string }
+  | { type: "toggle-pinned"; destinationId: string }
   | { type: "set-operations"; operations: OperationsState }
-  | { type: "set-preferences"; preferences: Partial<UserPreferences> };
+  | { type: "set-preferences"; preferences: Partial<UserPreferences> }
+  | { type: "set-settings-open"; isOpen: boolean }
+  | { type: "reset-preferences" };
 
 const defaultOperations: OperationsState = {
   crowding: 54,
@@ -25,24 +42,69 @@ const defaultOperations: OperationsState = {
   support: 72
 };
 
-const initialState: AppState = {
-  travelerModeId: "veteran",
-  selectedDestination: null,
-  currentLocation,
-  recentSearches: [],
-  navigation: {
-    route: null,
-    isNavigating: false,
-    hasArrived: false
-  },
-  preferences: {
-    reducedMotion: false,
-    highContrast: true
-  },
-  operations: defaultOperations
+const defaultPreferences: UserPreferences = {
+  reducedMotion: false,
+  highContrast: true,
+  largeText: false,
+  theme: "dark",
+  preferredWalkingSpeed: "standard",
+  accessibilityNeeds: [],
+  sensorySensitivity: "medium",
+  preferredLanguage: "en",
+  notificationsEnabled: true
 };
 
+function getInitialAirport(storedAirportId: string): AirportConfig {
+  return airports.find((airport) => airport.id === storedAirportId) ?? defaultAirport;
+}
+
+function getCurrentLocation(airport: AirportConfig): AirportLocation {
+  return (
+    airport.locations.find((location) => location.name === "Information Desk") ??
+    airport.locations[0]
+  );
+}
+
+function readInitialState(): AppState {
+  const stored = readStoredValue<StoredPlatformState>("beacon-platform-state", {
+    airportId: defaultAirport.id,
+    travelerModeId: "veteran",
+    favoriteDestinationIds: [],
+    pinnedDestinationIds: [],
+    preferences: defaultPreferences
+  });
+  const airport = getInitialAirport(stored.airportId);
+
+  return {
+    airportId: airport.id,
+    travelerModeId: stored.travelerModeId,
+    selectedDestination: null,
+    currentLocation: getCurrentLocation(airport),
+    recentSearches: [],
+    favoriteDestinationIds: stored.favoriteDestinationIds,
+    pinnedDestinationIds: stored.pinnedDestinationIds,
+    navigation: {
+      route: null,
+      isNavigating: false,
+      hasArrived: false
+    },
+    preferences: { ...defaultPreferences, ...stored.preferences },
+    operations: defaultOperations,
+    activeSettingsPanel: false,
+    notifications: createMockNotifications(airport.iata)
+  };
+}
+
 function withRoute(state: AppState, destination: AirportLocation, modeId = state.travelerModeId): AppState {
+  const airport = getInitialAirport(state.airportId);
+  const route = createGraphRoute(airport.locations, state.currentLocation, destination, modeId);
+
+  analytics.track("navigation_started", {
+    airport: airport.iata,
+    destination: destination.name,
+    mode: modeId
+  });
+
   return {
     ...state,
     travelerModeId: modeId,
@@ -50,18 +112,35 @@ function withRoute(state: AppState, destination: AirportLocation, modeId = state
     recentSearches: [
       destination,
       ...state.recentSearches.filter((location) => location.id !== destination.id)
-    ].slice(0, 5),
+    ].slice(0, 6),
     navigation: {
-      route: createRoute(state.currentLocation, destination, modeId),
+      route,
       isNavigating: true,
       hasArrived: false
     }
   };
 }
 
+function toggleId(ids: string[], id: string): string[] {
+  return ids.includes(id) ? ids.filter((value) => value !== id) : [id, ...ids].slice(0, 12);
+}
+
 function reducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    case "set-airport": {
+      analytics.track("airport_changed", { airport: action.airport.iata });
+      return {
+        ...state,
+        airportId: action.airport.id,
+        currentLocation: getCurrentLocation(action.airport),
+        selectedDestination: null,
+        recentSearches: [],
+        navigation: { route: null, isNavigating: false, hasArrived: false },
+        notifications: createMockNotifications(action.airport.iata)
+      };
+    }
     case "set-traveler-mode": {
+      analytics.track("traveler_mode_changed", { mode: action.modeId });
       if (state.selectedDestination) {
         return withRoute(state, state.selectedDestination, action.modeId);
       }
@@ -69,18 +148,21 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, travelerModeId: action.modeId };
     }
     case "select-destination":
+      analytics.track("destination_selected", {
+        destination: action.destination.name,
+        category: action.destination.category
+      });
       return withRoute(state, action.destination);
     case "clear-destination":
       return {
         ...state,
         selectedDestination: null,
-        navigation: {
-          route: null,
-          isNavigating: false,
-          hasArrived: false
-        }
+        navigation: { route: null, isNavigating: false, hasArrived: false }
       };
     case "arrive":
+      analytics.track("navigation_completed", {
+        destination: state.selectedDestination?.name ?? "unknown"
+      });
       return {
         ...state,
         navigation: {
@@ -89,35 +171,84 @@ function reducer(state: AppState, action: AppAction): AppState {
           hasArrived: true
         }
       };
+    case "toggle-favorite":
+      analytics.track("favorite_toggled", { destinationId: action.destinationId });
+      return { ...state, favoriteDestinationIds: toggleId(state.favoriteDestinationIds, action.destinationId) };
+    case "toggle-pinned":
+      return { ...state, pinnedDestinationIds: toggleId(state.pinnedDestinationIds, action.destinationId) };
     case "set-operations":
       return { ...state, operations: action.operations };
     case "set-preferences":
+      analytics.track("settings_updated", { keys: Object.keys(action.preferences).join(",") });
       return { ...state, preferences: { ...state.preferences, ...action.preferences } };
+    case "set-settings-open":
+      return { ...state, activeSettingsPanel: action.isOpen };
+    case "reset-preferences":
+      return { ...state, preferences: defaultPreferences };
     default:
       return state;
   }
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, undefined, readInitialState);
+  const airport = useMemo(() => getInitialAirport(state.airportId), [state.airportId]);
   const activeMode = useMemo(
     () => travelerModes.find((mode) => mode.id === state.travelerModeId) ?? travelerModes[0],
     [state.travelerModeId]
   );
+  const favoriteDestinations = useMemo(
+    () => airport.locations.filter((location) => state.favoriteDestinationIds.includes(location.id)),
+    [airport.locations, state.favoriteDestinationIds]
+  );
+  const pinnedDestinations = useMemo(
+    () => airport.locations.filter((location) => state.pinnedDestinationIds.includes(location.id)),
+    [airport.locations, state.pinnedDestinationIds]
+  );
+
+  useEffect(() => {
+    writeStoredValue<StoredPlatformState>("beacon-platform-state", {
+      airportId: state.airportId,
+      travelerModeId: state.travelerModeId,
+      favoriteDestinationIds: state.favoriteDestinationIds,
+      pinnedDestinationIds: state.pinnedDestinationIds,
+      preferences: state.preferences
+    });
+  }, [
+    state.airportId,
+    state.favoriteDestinationIds,
+    state.pinnedDestinationIds,
+    state.preferences,
+    state.travelerModeId
+  ]);
 
   const value = useMemo<AppContextValue>(
     () => ({
       ...state,
+      airport,
+      airports,
       activeMode,
-      locations,
+      locations: airport.locations,
+      favoriteDestinations,
+      pinnedDestinations,
+      setAirport: (airportId) => {
+        const selectedAirport = airports.find((candidate) => candidate.id === airportId);
+        if (selectedAirport) {
+          dispatch({ type: "set-airport", airport: selectedAirport });
+        }
+      },
       setTravelerMode: (modeId) => dispatch({ type: "set-traveler-mode", modeId }),
       selectDestination: (destination) => dispatch({ type: "select-destination", destination }),
       clearDestination: () => dispatch({ type: "clear-destination" }),
       markArrived: () => dispatch({ type: "arrive" }),
+      toggleFavorite: (destinationId) => dispatch({ type: "toggle-favorite", destinationId }),
+      togglePinned: (destinationId) => dispatch({ type: "toggle-pinned", destinationId }),
       setOperations: (operations) => dispatch({ type: "set-operations", operations }),
-      setPreferences: (preferences) => dispatch({ type: "set-preferences", preferences })
+      setPreferences: (preferences) => dispatch({ type: "set-preferences", preferences }),
+      setSettingsOpen: (isOpen) => dispatch({ type: "set-settings-open", isOpen }),
+      resetPreferences: () => dispatch({ type: "reset-preferences" })
     }),
-    [activeMode, state]
+    [activeMode, airport, favoriteDestinations, pinnedDestinations, state]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -52,7 +52,12 @@ export function NavigationPanel({ navigation, mode, onArrive }: Props) {
         {route.steps.map((step) => (
           <li key={step.id}>
             <Footprints aria-hidden="true" />
-            <span>{step.instruction}</span>
+            <span>
+              {step.instruction}
+              {typeof step.remainingDistanceFeet === "number" ? (
+                <small>{formatDistance(step.remainingDistanceFeet)} remaining</small>
+              ) : null}
+            </span>
           </li>
         ))}
       </ol>

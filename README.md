@@ -1,48 +1,44 @@
 # Beacon OS 3.0
 
-Beacon OS 3.0 is a React/Vite prototype for Beacon, an enterprise-grade Environmental Intelligence Platform for airports. It uses the provided Beacon logo and pitch-flyer direction to create a premium first-screen experience rather than a conventional marketing page or dashboard.
+Beacon OS 3.0 is a React, TypeScript, and Vite pilot application for airport environmental intelligence and traveler-aware indoor navigation.
 
-## What This Includes
+The current build supports multi-airport pilot configuration, searchable terminal destinations, graph-based route generation, traveler mode personalization, accessibility settings, saved destinations, airport information pages, local notification scaffolding, and offline-readiness helpers.
 
-- Firebase-ready email/password authentication.
-- Firebase-ready Google sign-in.
-- Veteran-friendly access panel with large controls, clear copy, high contrast, and useful error states.
-- Animated Beacon boot sequence using the provided logo.
-- Airport digital-twin style experience with traveler modes for Veteran PTSD, Sensory, Accessibility, Family, and Business Traveler.
-- Environmental intelligence readouts for crowding, noise, wait time, route distance, and support zones.
-- Airport operations simulation panel with range controls.
-- Mobile-responsive layout and reduced-motion support.
-- Vitest tests for account access and traveler mode switching.
+## Current Capabilities
+
+- Pilot airport switching for GSP, AVL, and CLT.
+- Airport-scoped maps, locations, accessibility resources, and information pages.
+- Intelligent destination search with fuzzy matching, synonyms, categories, keywords, terminal names, and gate numbers.
+- Interactive SVG terminal map with zoom, pan, current position, destination highlighting, and route overlays.
+- Graph-based navigation engine using Dijkstra shortest path.
+- Turn-by-turn route instructions with distance, estimated time, and remaining distance.
+- Traveler modes for Veteran PTSD, Sensory, Accessibility, Family, Business, and International travelers.
+- Persisted traveler preferences, themes, reduced motion, large text, high contrast, notifications, favorites, and pinned destinations.
+- Firebase-ready account access in preview mode.
+- Local analytics, mock notifications, and offline manifest helpers.
 
 ## Setup
 
-1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env.local`.
+1. Install dependencies with `pnpm install`.
+2. Copy `.env.example` to `.env.local` if Firebase auth should be connected.
 3. Add Firebase web app values to `.env.local`.
-4. Enable Email/Password and Google providers in Firebase Authentication.
-5. Run `npm run dev`.
+4. Run `pnpm run dev`.
 
 ## Verification
 
 Use these checks before deployment:
 
-- `npm run test`
-- `npm run build`
-- `npm run lint`
-- `npm run format`
+- `pnpm run test`
+- `pnpm run lint`
+- `pnpm run build`
 
-## Architecture Notes
+## Project Docs
 
-Authentication is isolated under `src/lib`. Product experience components live under `src/components`. The UI keeps the first viewport focused on the operational experience: logo boot, airport intelligence surface, account access, and operations simulation.
+- `ROADMAP.md`: sprint history, architectural decisions, limitations, and next steps.
+- `ARCHITECTURE.md`: platform architecture and data flow.
+- `COMPONENTS.md`: reusable UI and feature component guide.
+- `CONTRIBUTING.md`: local development and quality expectations.
 
 ## Security Notes
 
 Firebase credentials must stay in environment variables. Do not commit `.env.local`. Firebase Authentication should enforce authorized domains and provider restrictions before production use.
-
-## Next Engineering Steps
-
-- Replace the CSS map simulation with a real React Three Fiber airport digital twin.
-- Add route simulation state and real airport graph data.
-- Add Firestore user profiles for accessibility preferences.
-- Add analytics events for mode selection and route simulation.
-- Add AppDeploy build/deploy configuration once the deployment target is connected.

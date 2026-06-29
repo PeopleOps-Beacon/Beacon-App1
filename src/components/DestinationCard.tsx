@@ -1,4 +1,4 @@
-import { Accessibility, Clock, MapPin, Tags, X } from "lucide-react";
+import { Accessibility, Clock, MapPin, Pin, Star, Tags, X } from "lucide-react";
 import type { AirportLocation, Route, TravelerMode } from "../types";
 import { formatDistance, getNearbyLocations } from "../utils/navigation";
 
@@ -7,10 +7,24 @@ type Props = {
   locations: AirportLocation[];
   mode: TravelerMode;
   route: Route | null;
+  isFavorite: boolean;
+  isPinned: boolean;
   onClear: () => void;
+  onToggleFavorite: (destinationId: string) => void;
+  onTogglePinned: (destinationId: string) => void;
 };
 
-export function DestinationCard({ destination, locations, mode, route, onClear }: Props) {
+export function DestinationCard({
+  destination,
+  isFavorite,
+  isPinned,
+  locations,
+  mode,
+  onClear,
+  onToggleFavorite,
+  onTogglePinned,
+  route
+}: Props) {
   if (!destination) {
     return (
       <section className="destination-card empty" aria-label="Destination details">
@@ -30,9 +44,25 @@ export function DestinationCard({ destination, locations, mode, route, onClear }
           <p className="eyebrow">{destination.category}</p>
           <h2 id="destination-title">{destination.name}</h2>
         </div>
-        <button aria-label="Clear selected destination" onClick={onClear} type="button">
-          <X aria-hidden="true" />
-        </button>
+        <div className="destination-actions">
+          <button
+            aria-label={isFavorite ? "Remove favorite" : "Save favorite"}
+            onClick={() => onToggleFavorite(destination.id)}
+            type="button"
+          >
+            <Star aria-hidden="true" fill={isFavorite ? "currentColor" : "none"} />
+          </button>
+          <button
+            aria-label={isPinned ? "Unpin destination" : "Pin destination"}
+            onClick={() => onTogglePinned(destination.id)}
+            type="button"
+          >
+            <Pin aria-hidden="true" fill={isPinned ? "currentColor" : "none"} />
+          </button>
+          <button aria-label="Clear selected destination" onClick={onClear} type="button">
+            <X aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       <p>{destination.description}</p>

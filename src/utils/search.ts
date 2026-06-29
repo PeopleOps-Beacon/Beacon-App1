@@ -1,7 +1,26 @@
 import type { AirportLocation, TravelerModeId } from "../types";
 
+const synonyms: Record<string, string[]> = {
+  bathroom: ["restroom", "toilet", "family restroom"],
+  tsa: ["security", "checkpoint", "screening"],
+  coffee: ["cafe", "espresso", "drink"],
+  uber: ["ride share", "pickup", "lyft"],
+  military: ["uso", "veteran"],
+  baby: ["nursing", "family", "infant"],
+  help: ["information", "support", "assistance"]
+};
+
 function normalize(value: string): string {
   return value.toLowerCase().trim();
+}
+
+function expandQuery(query: string): string[] {
+  const normalized = normalize(query);
+  const expansions = Object.entries(synonyms)
+    .filter(([word]) => normalized.includes(word))
+    .flatMap(([, values]) => values);
+
+  return [normalized, ...expansions];
 }
 
 function fuzzyScore(query: string, target: string): number {
@@ -32,7 +51,8 @@ export function searchLocations(
   locations: AirportLocation[],
   travelerMode?: TravelerModeId
 ): AirportLocation[] {
-  const normalizedQuery = normalize(query);
+  const queryTerms = expandQuery(query);
+  const normalizedQuery = queryTerms[0];
 
   if (!normalizedQuery) {
     return locations
@@ -53,11 +73,16 @@ export function searchLocations(
         ...location.accessibilityFeatures
       ].join(" ");
 
-      const score = fuzzyScore(normalizedQuery, searchable);
+      const score = Math.max(...queryTerms.map((term) => fuzzyScore(term, searchable)));
       const modeBoost =
         travelerMode && location.travelerModesSupported.includes(travelerMode) ? 12 : 0;
+      const categoryBoost = normalizedQuery === location.category ? 20 : 0;
+      const gateBoost =
+        normalizedQuery.replace(/\s/g, "") === location.name.toLowerCase().replace(/\s/g, "")
+          ? 25
+          : 0;
 
-      return { location, score: score + modeBoost };
+      return { location, score: score + modeBoost + categoryBoost + gateBoost };
     })
     .filter((entry) => entry.score > 0)
     .sort((first, second) => second.score - first.score || first.location.name.localeCompare(second.location.name))

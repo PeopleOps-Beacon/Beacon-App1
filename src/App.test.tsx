@@ -37,4 +37,24 @@ describe("Beacon OS", () => {
 
     expect(screen.getByText(/arrival confirmed/i)).toBeInTheDocument();
   });
+
+  it("switches pilot airports without reloading", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.selectOptions(screen.getByLabelText(/^airport$/i), "avl");
+
+    expect(screen.getByRole("heading", { name: /^avl pilot console$/i })).toBeInTheDocument();
+    expect(screen.getByText(/asheville regional airport/i)).toBeInTheDocument();
+  });
+
+  it("opens settings and updates traveler preferences", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: /open settings/i }));
+    await user.selectOptions(screen.getByLabelText(/theme/i), "calm");
+
+    expect(screen.getByRole("button", { name: /hide settings/i })).toBeInTheDocument();
+  });
 });
