@@ -29,7 +29,7 @@ export function EnterpriseDashboard({
         <span>{favorites.length} favorites</span>
         <span>{recents.length} recent</span>
         <span>{notifications.filter((notification) => !notification.dismissed).length} alerts</span>
-        <span>Weather placeholder</span>
+        <span>{notifications.length} live updates</span>
       </div>
     </section>
   );

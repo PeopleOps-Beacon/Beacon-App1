@@ -7,7 +7,7 @@ import { FlightService } from "./enterpriseServices";
 import { createGraphRoute } from "../utils/pathfinder";
 
 describe("enterprise services", () => {
-  it("searches mock flights", () => {
+  it("searches pilot flights", () => {
     expect(FlightService.search("DL 241")[0].gate).toBe("A7");
   });
 

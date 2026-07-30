@@ -1,0 +1,46 @@
+import runtime from "react/index.js";
+
+const ReactRuntime = runtime as Record<string, unknown>;
+
+export const Children = ReactRuntime.Children;
+export const Component = ReactRuntime.Component;
+export const Fragment = ReactRuntime.Fragment;
+export const Profiler = ReactRuntime.Profiler;
+export const PureComponent = ReactRuntime.PureComponent;
+export const StrictMode = ReactRuntime.StrictMode;
+export const Suspense = ReactRuntime.Suspense;
+export const Activity = ReactRuntime.Activity;
+export const cache = ReactRuntime.cache;
+export const captureOwnerStack = ReactRuntime.captureOwnerStack;
+export const cloneElement = ReactRuntime.cloneElement;
+export const createContext = ReactRuntime.createContext;
+export const createElement = ReactRuntime.createElement;
+export const createRef = ReactRuntime.createRef;
+export const forwardRef = ReactRuntime.forwardRef;
+export const isValidElement = ReactRuntime.isValidElement;
+export const lazy = ReactRuntime.lazy;
+export const memo = ReactRuntime.memo;
+export const startTransition = ReactRuntime.startTransition;
+export const unstable_act = ReactRuntime.unstable_act;
+export const use = ReactRuntime.use;
+export const useActionState = ReactRuntime.useActionState;
+export const useCallback = ReactRuntime.useCallback;
+export const useContext = ReactRuntime.useContext;
+export const useDebugValue = ReactRuntime.useDebugValue;
+export const useDeferredValue = ReactRuntime.useDeferredValue;
+export const useEffect = ReactRuntime.useEffect;
+export const useEffectEvent = ReactRuntime.useEffectEvent;
+export const useId = ReactRuntime.useId;
+export const useImperativeHandle = ReactRuntime.useImperativeHandle;
+export const useInsertionEffect = ReactRuntime.useInsertionEffect;
+export const useLayoutEffect = ReactRuntime.useLayoutEffect;
+export const useMemo = ReactRuntime.useMemo;
+export const useOptimistic = ReactRuntime.useOptimistic;
+export const useReducer = ReactRuntime.useReducer;
+export const useRef = ReactRuntime.useRef;
+export const useState = ReactRuntime.useState;
+export const useSyncExternalStore = ReactRuntime.useSyncExternalStore;
+export const useTransition = ReactRuntime.useTransition;
+export const version = ReactRuntime.version;
+
+export default runtime;

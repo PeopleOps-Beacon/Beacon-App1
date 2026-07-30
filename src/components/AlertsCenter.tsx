@@ -1,9 +1,9 @@
 import { TriangleAlert } from "lucide-react";
-import { airportAlerts } from "../data/enterprise";
+import { AirportAlertsService } from "../services/AirportAlertsService";
 import type { AirportConfig } from "../types";
 
 export function AlertsCenter({ airport }: { airport: AirportConfig }) {
-  const alerts = airportAlerts.filter((alert) => alert.airportId === airport.id);
+  const alerts = AirportAlertsService.getAlerts(airport);
 
   return (
     <section className="enterprise-panel" aria-labelledby="alerts-title">

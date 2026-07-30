@@ -1,0 +1,17 @@
+{
+  "name": "Beacon OS",
+  "short_name": "Beacon",
+  "description": "Premium airport accessibility intelligence workspace.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090b",
+  "theme_color": "#f6bd34",
+  "icons": [
+    {
+      "src": "/brand/beacon-logo-full.png",
+      "sizes": "1536x864",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

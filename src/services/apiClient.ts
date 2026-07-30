@@ -7,10 +7,39 @@ type CacheEntry<T> = {
 
 const cache = new Map<string, CacheEntry<unknown>>();
 
-export async function mockApiRequest<T>(
+function withTimeout<T>(loader: () => T | Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const timeoutId = globalThis.setTimeout(() => {
+      settled = true;
+      reject(new Error("Airport API request timed out"));
+    }, timeoutMs);
+
+    Promise.resolve()
+      .then(loader)
+      .then((data) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        globalThis.clearTimeout(timeoutId);
+        resolve(data);
+      })
+      .catch((error: unknown) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        globalThis.clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
+}
+
+export async function resilientApiRequest<T>(
   key: string,
-  loader: () => T,
-  options: { retries?: number; cacheMs?: number } = {}
+  loader: () => T | Promise<T>,
+  options: { retries?: number; cacheMs?: number; timeoutMs?: number } = {}
 ): Promise<ApiResult<T>> {
   const cacheMs = options.cacheMs ?? 30_000;
   const cached = cache.get(key) as CacheEntry<T> | undefined;
@@ -24,11 +53,12 @@ export async function mockApiRequest<T>(
   }
 
   const retries = options.retries ?? 1;
+  const timeoutMs = options.timeoutMs ?? 2_000;
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
-      const data = loader();
+      const data = await withTimeout(loader, timeoutMs);
       cache.set(key, { data, timestamp: Date.now() });
       return { data, cached: false, receivedAt: new Date().toISOString() };
     } catch (error) {
@@ -36,5 +66,5 @@ export async function mockApiRequest<T>(
     }
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Mock API request failed");
+  throw lastError instanceof Error ? lastError : new Error("Airport API request failed");
 }

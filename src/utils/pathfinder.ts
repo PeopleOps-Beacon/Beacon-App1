@@ -102,13 +102,13 @@ export function findShortestPath(
   return path[0] === startNodeId ? path : [startNodeId, endNodeId];
 }
 
-export function createGraphRoute(
+export function createRouteFromGraph(
+  graph: NavigationGraph,
   locations: AirportLocation[],
   from: AirportLocation,
   to: AirportLocation,
   travelerMode: TravelerModeId
 ): Route {
-  const graph = buildNavigationGraph(locations);
   const requireAccessible = travelerMode === "accessibility";
   const nodePath = findShortestPath(graph, from.id, to.id, requireAccessible);
   const nodeLocations = nodePath
@@ -131,6 +131,15 @@ export function createGraphRoute(
     path,
     accessible: requireAccessible || to.accessibilityFeatures.includes("step-free")
   };
+}
+
+export function createGraphRoute(
+  locations: AirportLocation[],
+  from: AirportLocation,
+  to: AirportLocation,
+  travelerMode: TravelerModeId
+): Route {
+  return createRouteFromGraph(buildNavigationGraph(locations), locations, from, to, travelerMode);
 }
 
 function buildRouteSteps(path: AirportLocation[], totalDistanceFeet: number): RouteStep[] {

@@ -7,7 +7,7 @@ import type {
   RoutePreference,
   TravelerModeId
 } from "../types";
-import { createGraphRoute } from "./pathfinder";
+import { buildNavigationGraph, createRouteFromGraph } from "./pathfinder";
 
 const preferences: RoutePreference[] = [
   "fastest",
@@ -27,10 +27,12 @@ export function createRouteOptions(
   travelerMode: TravelerModeId,
   conditions: AirportCondition[]
 ): RouteOption[] {
+  const graph = buildNavigationGraph(locations);
+
   return preferences
     .map((preference) => {
       const baseMode = preference === "accessible" || preference === "wheelchair" ? "accessibility" : travelerMode;
-      const route = createGraphRoute(locations, from, to, baseMode);
+      const route = createRouteFromGraph(graph, locations, from, to, baseMode);
       const warnings = findConditionWarnings(route.path, locations, conditions);
       const penalty = warnings.length * 45;
       const distanceAdjustment = getDistanceAdjustment(preference);

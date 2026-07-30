@@ -30,7 +30,7 @@ export function DestinationCard({
       <section className="destination-card empty" aria-label="Destination details">
         <MapPin aria-hidden="true" />
         <h2>Select a destination</h2>
-        <p>Search or tap the map to generate a mock route and see traveler-mode guidance.</p>
+        <p>Search or tap the map to generate a route and see traveler-mode guidance.</p>
       </section>
     );
   }

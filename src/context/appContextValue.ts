@@ -1,16 +1,20 @@
 import { createContext } from "react";
 import type {
+  AIRecommendationCard,
   AirportConfig,
   AirportLocation,
   AirportCondition,
+  AirportIntelligence,
   MapLayerId,
   NavigationState,
   OperationsState,
+  RouteRecommendation,
   RouteOption,
   RoutePreference,
   SmartNotification,
   TravelerMode,
   TravelerModeId,
+  TravelerProfile,
   UserPreferences
 } from "../types";
 
@@ -21,6 +25,7 @@ export type AppState = {
   currentLocation: AirportLocation;
   recentSearches: AirportLocation[];
   favoriteDestinationIds: string[];
+  recentDestinationIds: string[];
   pinnedDestinationIds: string[];
   selectedRoutePreference: RoutePreference;
   routeOptions: RouteOption[];
@@ -40,6 +45,11 @@ export type AppContextValue = AppState & {
   locations: AirportLocation[];
   favoriteDestinations: AirportLocation[];
   pinnedDestinations: AirportLocation[];
+  travelerProfile: TravelerProfile;
+  airportIntelligence: AirportIntelligence;
+  routeRecommendation: RouteRecommendation | null;
+  recommendationCards: AIRecommendationCard[];
+  stressScore: number;
   setAirport: (airportId: string) => void;
   setTravelerMode: (modeId: TravelerModeId) => void;
   selectDestination: (destination: AirportLocation) => void;

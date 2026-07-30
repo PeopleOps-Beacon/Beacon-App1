@@ -1,17 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { locations } from "../data/locations";
+import { airports } from "../data/airports";
 import { searchLocations } from "./search";
 
-describe("searchLocations", () => {
-  it("searches names and keywords", () => {
-    const results = searchLocations("ptsd", locations, "veteran");
+describe("smart search", () => {
+  it("matches synonyms for restrooms and dining", () => {
+    const airport = airports[0];
 
-    expect(results[0].name).toBe("Quiet Room");
+    expect(searchLocations("bathroom", airport.locations)[0].category).toBe("restroom");
+    expect(searchLocations("eat", airport.locations).some((location) => location.category === "dining")).toBe(true);
   });
 
-  it("supports fuzzy destination search", () => {
-    const results = searchLocations("gt a7", locations, "business");
+  it("handles small typos in airport searches", () => {
+    const airport = airports[0];
 
-    expect(results.some((location) => location.id === "gate-a7")).toBe(true);
+    expect(searchLocations("restrrom", airport.locations).some((location) => location.category === "restroom")).toBe(true);
   });
 });

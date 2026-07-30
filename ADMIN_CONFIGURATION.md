@@ -1,19 +1,24 @@
 # Admin Configuration
 
-Sprint 4 adds a data-driven administrative configuration surface.
+Sprint 5 expands the administrative configuration surface from read-only counts into an airport-scoped management workspace.
 
 ## Configurable Areas
 
-- Airports
-- Locations
-- Categories
-- Traveler modes
-- Map layers
+- Gates
+- Restaurants
+- Amenities
+- Accessibility locations
+- Map inventory summary
 - Airport alerts
-- Accessibility resources
-- Services directory entries
+- Airport announcements
+- Service disruptions
+- Location operating status
 - Feature flags
 
 ## Current Implementation
 
-The admin panel is read-only and unauthenticated for pilot demonstration. It displays configuration counts and feature-flag state from local typed data. Sprint 5 can add authenticated editing, validation, publishing workflows, and audit logs without changing the core data model.
+The admin panel uses typed airport data and local airport-scoped persistence for pilot demonstrations. It is visible only to local pilot sessions with Airport Administrator or Beacon Administrator roles. Administrators can mark managed locations open, restricted, or closed; publish announcements; log service disruptions; and resolve or reopen disruptions.
+
+## Production Requirements
+
+For a live pilot, connect admin actions to authenticated cloud storage or airport-approved operations APIs. Use Firebase custom claims or the selected identity provider to enforce Airport Administrator and Beacon Administrator access.

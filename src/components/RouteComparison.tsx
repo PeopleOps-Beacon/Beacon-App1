@@ -22,7 +22,7 @@ export function RouteComparison({ options, selectedPreference, onSelect }: Props
         <p>Select a destination to compare intelligent routes.</p>
       ) : (
         <div className="route-option-list">
-          {options.slice(0, 5).map((option) => (
+          {options.map((option) => (
             <button
               aria-pressed={option.preference === selectedPreference}
               className={option.preference === selectedPreference ? "route-option active" : "route-option"}

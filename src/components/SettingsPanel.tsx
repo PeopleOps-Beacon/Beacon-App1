@@ -1,6 +1,7 @@
-import { Bell, Eye, Languages, Navigation, Settings, ShieldCheck, Type, Volume2 } from "lucide-react";
-import type { ReactNode } from "react";
-import type { UserPreferences } from "../types";
+import { Bell, Brain, Database, Eye, Footprints, Languages, Navigation, Route, Settings, ShieldCheck, SlidersHorizontal, Type, Users, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { routePreferenceLabels } from "../data/enterprise";
+import type { AccessibilityFeature, RoutePreference, UserPreferences } from "../types";
 import { Button } from "./ui/Button";
 
 type Props = {
@@ -11,7 +12,97 @@ type Props = {
   onToggle: (isOpen: boolean) => void;
 };
 
+const routePreferenceChoices: RoutePreference[] = [
+  "fastest",
+  "accessible",
+  "quietest",
+  "family",
+  "least-walking",
+  "fewest-elevators",
+  "fewest-stairs",
+  "wheelchair"
+];
+
+const accessibilityNeedChoices: Array<{ id: AccessibilityFeature; label: string }> = [
+  { id: "wheelchair-accessible", label: "Wheelchair" },
+  { id: "step-free", label: "Mobility impairment" },
+  { id: "quiet", label: "Anxiety reduction" },
+  { id: "low-sensory", label: "Autism / sensory" },
+  { id: "visual-assistance", label: "Vision impairment" },
+  { id: "hearing-loop", label: "Hearing impairment" },
+  { id: "service-animal-friendly", label: "Service animal" },
+  { id: "family-friendly", label: "Family support" }
+];
+
+type EnterpriseSettings = {
+  analyticsSharing: boolean;
+  privacyMode: boolean;
+};
+
+const enterpriseSettingsKey = "beacon-enterprise-settings";
+const defaultEnterpriseSettings: EnterpriseSettings = {
+  analyticsSharing: true,
+  privacyMode: false
+};
+
+function readEnterpriseSettings(): EnterpriseSettings {
+  if (typeof window === "undefined") {
+    return defaultEnterpriseSettings;
+  }
+
+  try {
+    const stored = window.localStorage.getItem(enterpriseSettingsKey);
+    return stored ? { ...defaultEnterpriseSettings, ...JSON.parse(stored) } : defaultEnterpriseSettings;
+  } catch {
+    return defaultEnterpriseSettings;
+  }
+}
+
 export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle }: Props) {
+  const [enterpriseSettings, setEnterpriseSettings] = useState(readEnterpriseSettings);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(enterpriseSettingsKey, JSON.stringify(enterpriseSettings));
+    } catch {
+      // Settings remain usable even if local storage is unavailable.
+    }
+  }, [enterpriseSettings]);
+
+  const toggleAccessibilityNeed = (need: AccessibilityFeature) => {
+    const needs = preferences.accessibilityNeeds.includes(need)
+      ? preferences.accessibilityNeeds.filter((item) => item !== need)
+      : [...preferences.accessibilityNeeds, need];
+
+    onChange({ accessibilityNeeds: needs });
+  };
+
+  const updateEnterpriseSetting = (setting: keyof EnterpriseSettings, value: boolean) => {
+    setEnterpriseSettings((current) => ({ ...current, [setting]: value }));
+  };
+
+  const handleDemoReset = () => {
+    ["beacon-enterprise-role", "beacon-guided-tour-dismissed", "beacon-error-log"].forEach((key) => {
+      try {
+        window.localStorage.removeItem(key);
+      } catch {
+        // Demo reset should never block preference recovery.
+      }
+    });
+    onReset();
+  };
+
+  const handleDataReset = () => {
+    try {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+    } catch {
+      // Reset still restores in-memory preferences if browser storage is unavailable.
+    }
+    setEnterpriseSettings(defaultEnterpriseSettings);
+    onReset();
+  };
+
   return (
     <section className="settings-panel" aria-labelledby="settings-title">
       <div className="panel-heading">
@@ -37,6 +128,7 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
             >
               <option value="dark">Dark</option>
               <option value="light">Light</option>
+              <option value="system">System</option>
               <option value="calm">PTSD Calm</option>
               <option value="high-contrast">High Contrast</option>
             </select>
@@ -51,12 +143,11 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
               }
               value={preferences.preferredRouteType}
             >
-              <option value="fastest">Fastest</option>
-              <option value="accessible">Most accessible</option>
-              <option value="quietest">Quietest</option>
-              <option value="family">Family friendly</option>
-              <option value="least-walking">Least walking</option>
-              <option value="wheelchair">Wheelchair optimized</option>
+              {routePreferenceChoices.map((preference) => (
+                <option key={preference} value={preference}>
+                  {routePreferenceLabels[preference]}
+                </option>
+              ))}
             </select>
           </label>
           <label>
@@ -106,6 +197,57 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
               <option value="high">High</option>
             </select>
           </label>
+          <fieldset className="preference-fieldset">
+            <legend>Accessibility needs</legend>
+            <div className="preference-chip-grid">
+              {accessibilityNeedChoices.map((need) => (
+                <label key={need.id}>
+                  <input
+                    checked={preferences.accessibilityNeeds.includes(need.id)}
+                    onChange={() => toggleAccessibilityNeed(need.id)}
+                    type="checkbox"
+                  />
+                  {need.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <Toggle
+            checked={preferences.aiRecommendationsEnabled}
+            icon={<Brain aria-hidden="true" />}
+            label="AI recommendations"
+            onChange={(value) => onChange({ aiRecommendationsEnabled: value })}
+          />
+          <Toggle
+            checked={preferences.smartNotificationsEnabled}
+            icon={<Bell aria-hidden="true" />}
+            label="Smart notifications"
+            onChange={(value) => onChange({ smartNotificationsEnabled: value })}
+          />
+          <Toggle
+            checked={preferences.reduceWalkingDistance}
+            icon={<Footprints aria-hidden="true" />}
+            label="Reduce walking distance"
+            onChange={(value) => onChange({ reduceWalkingDistance: value })}
+          />
+          <Toggle
+            checked={preferences.preferAccessibleRoutes}
+            icon={<Route aria-hidden="true" />}
+            label="Prefer accessible routes"
+            onChange={(value) => onChange({ preferAccessibleRoutes: value })}
+          />
+          <Toggle
+            checked={preferences.avoidCrowds}
+            icon={<Users aria-hidden="true" />}
+            label="Avoid crowds"
+            onChange={(value) => onChange({ avoidCrowds: value })}
+          />
+          <Toggle
+            checked={preferences.avoidNoise}
+            icon={<VolumeX aria-hidden="true" />}
+            label="Avoid noise"
+            onChange={(value) => onChange({ avoidNoise: value })}
+          />
           <Toggle
             checked={preferences.voiceGuidanceEnabled}
             icon={<Volume2 aria-hidden="true" />}
@@ -131,18 +273,44 @@ export function SettingsPanel({ isOpen, preferences, onChange, onReset, onToggle
             onChange={(value) => onChange({ reducedMotion: value })}
           />
           <Toggle
+            checked={!preferences.reducedMotion}
+            icon={<SlidersHorizontal aria-hidden="true" />}
+            label="Animation control"
+            onChange={(value) => onChange({ reducedMotion: !value })}
+          />
+          <Toggle
             checked={preferences.notificationsEnabled}
             icon={<Bell aria-hidden="true" />}
-            label="Mock notifications"
+            label="Notifications"
             onChange={(value) => onChange({ notificationsEnabled: value })}
+          />
+          <Toggle
+            checked={enterpriseSettings.privacyMode}
+            icon={<ShieldCheck aria-hidden="true" />}
+            label="Privacy mode"
+            onChange={(value) => updateEnterpriseSetting("privacyMode", value)}
+          />
+          <Toggle
+            checked={enterpriseSettings.analyticsSharing}
+            icon={<Database aria-hidden="true" />}
+            label="Share demo analytics"
+            onChange={(value) => updateEnterpriseSetting("analyticsSharing", value)}
           />
           <p className="settings-note">
             <Navigation aria-hidden="true" /> Smart routes and <Languages aria-hidden="true" /> translations
             are configured locally for pilot demos.
           </p>
-          <Button onClick={onReset} variant="ghost">
-            Reset preferences
-          </Button>
+          <div className="settings-action-row">
+            <Button onClick={onReset} variant="ghost">
+              Reset preferences
+            </Button>
+            <Button onClick={handleDemoReset} variant="secondary">
+              Demo reset
+            </Button>
+            <Button onClick={handleDataReset} variant="secondary">
+              Data reset
+            </Button>
+          </div>
         </div>
       ) : null}
     </section>

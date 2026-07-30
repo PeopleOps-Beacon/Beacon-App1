@@ -10,16 +10,16 @@ import type {
   AirportConfig,
   AirportServiceListing
 } from "../types";
-import { mockApiRequest } from "./apiClient";
+import { resilientApiRequest } from "./apiClient";
 
 export const AirportService = {
   listAlerts(airport: AirportConfig) {
-    return mockApiRequest<AirportAlert[]>(`alerts:${airport.id}`, () =>
+    return resilientApiRequest<AirportAlert[]>(`alerts:${airport.id}`, () =>
       airportAlerts.filter((alert) => alert.airportId === airport.id)
     );
   },
   listConditions(airport: AirportConfig) {
-    return mockApiRequest<AirportCondition[]>(`conditions:${airport.id}`, () =>
+    return resilientApiRequest<AirportCondition[]>(`conditions:${airport.id}`, () =>
       airportConditions.filter((condition) => condition.airportId === airport.id)
     );
   }

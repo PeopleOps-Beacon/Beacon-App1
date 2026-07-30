@@ -225,5 +225,6 @@ export const featureFlags: FeatureFlags = {
   smartRoutes: true,
   voiceGuidance: true,
   adminConfig: true,
-  flightModule: true
+  flightModule: true,
+  aiRecommendations: true
 };

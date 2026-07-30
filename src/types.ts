@@ -17,6 +17,31 @@ export type TravelerMode = {
   icon: LucideIcon;
 };
 
+export type TravelerProfilePreferences = {
+  avoidCrowds?: boolean;
+  avoidNoise?: boolean;
+  preferQuietRoutes?: boolean;
+  frequentBreaks?: boolean;
+  avoidStairs?: boolean;
+  preferElevators?: boolean;
+  accessibleOnly?: boolean;
+  strollerFriendly?: boolean;
+  restroomPriority?: boolean;
+  foodPriority?: boolean;
+  fastestRoute?: boolean;
+  coffeeStops?: boolean;
+  gateAlerts?: boolean;
+  lowStimulus?: boolean;
+  avoidAnnouncements?: boolean;
+  quietWaitingAreas?: boolean;
+};
+
+export type TravelerProfile = {
+  id: TravelerModeId;
+  label: string;
+  preferences: TravelerProfilePreferences;
+};
+
 export type OperationsState = {
   crowding: number;
   noise: number;
@@ -156,11 +181,24 @@ export type NavigationState = {
   hasArrived: boolean;
 };
 
+export type UserRole = "traveler" | "airport-admin" | "beacon-admin";
+
+export type UserProfile = {
+  id: string;
+  email: string;
+  displayName: string;
+  role: UserRole;
+  airportId?: string;
+  provider: "firebase" | "pilot";
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type UserPreferences = {
   reducedMotion: boolean;
   highContrast: boolean;
   largeText: boolean;
-  theme: "dark" | "light" | "calm" | "high-contrast";
+  theme: "dark" | "light" | "calm" | "high-contrast" | "system";
   preferredWalkingSpeed: "slow" | "standard" | "fast";
   preferredRouteType: RoutePreference;
   favoriteCategories: LocationCategory[];
@@ -169,6 +207,12 @@ export type UserPreferences = {
   sensorySensitivity: "low" | "medium" | "high";
   preferredLanguage: SupportedLanguage;
   notificationsEnabled: boolean;
+  aiRecommendationsEnabled: boolean;
+  smartNotificationsEnabled: boolean;
+  reduceWalkingDistance: boolean;
+  preferAccessibleRoutes: boolean;
+  avoidCrowds: boolean;
+  avoidNoise: boolean;
   voiceGuidanceEnabled: boolean;
   voiceVolume: number;
   voiceRate: number;
@@ -182,6 +226,7 @@ export type NotificationItem = {
 };
 
 export type AnalyticsEventName =
+  | "session_started"
   | "airport_changed"
   | "search_performed"
   | "destination_selected"
@@ -194,7 +239,16 @@ export type AnalyticsEventName =
   | "notification_dismissed"
   | "flight_selected"
   | "map_layer_toggled"
-  | "admin_config_viewed";
+  | "admin_config_viewed"
+  | "auth_login"
+  | "auth_logout"
+  | "auth_password_reset"
+  | "auth_register"
+  | "auth_profile_updated"
+  | "auth_account_deleted"
+  | "error_captured"
+  | "ai_recommendation_viewed"
+  | "ai_recommendation_selected";
 
 export type AnalyticsEvent = {
   name: AnalyticsEventName;
@@ -223,6 +277,41 @@ export type RouteOption = Route & {
   conditionWarnings: string[];
 };
 
+export type AirportIntelligence = {
+  airportId: string;
+  crowdHeatmap: Array<{ locationId: string; level: number }>;
+  constructionZones: string[];
+  closedWalkways: string[];
+  securityWaitTime: number;
+  restaurantWaitTime: number;
+  parkingOccupancy: number;
+  weatherAlerts: string[];
+  crowdLevel: number;
+  noiseLevel: number;
+  severity: SmartNotificationSeverity;
+};
+
+export type RouteRecommendation = {
+  recommendedRoute: RouteOption;
+  alternativeRoute: RouteOption;
+  estimatedTimeMinutes: number;
+  accessibilityNotes: string[];
+  crowdLevel: "low" | "medium" | "high";
+  noiseLevel: "low" | "medium" | "high";
+  reason: string;
+};
+
+export type AIRecommendationCard = {
+  id: string;
+  locationId: string;
+  name: string;
+  type: string;
+  distanceFeet: number;
+  walkingTimeMinutes: number;
+  accessibility: string;
+  description: string;
+};
+
 export type AirportConditionCategory =
   | "crowd"
   | "construction"
@@ -231,7 +320,9 @@ export type AirportConditionCategory =
   | "escalator"
   | "restroom"
   | "security"
+  | "noise"
   | "shuttle"
+  | "support"
   | "parking";
 
 export type AirportCondition = {
@@ -246,10 +337,30 @@ export type AirportCondition = {
   waitMinutes?: number;
 };
 
+export type SmartNotificationSeverity = "low" | "medium" | "high" | "critical";
+
+export type SmartNotificationCategory =
+  | "gate-change"
+  | "heavy-crowd"
+  | "construction"
+  | "quiet-route"
+  | "accessible-restroom"
+  | "security-wait"
+  | "dining"
+  | "time-to-depart"
+  | "weather-delay"
+  | "system"
+  | "route"
+  | "support";
+
 export type SmartNotification = NotificationItem & {
-  priority: "low" | "medium" | "high" | "critical";
+  priority: SmartNotificationSeverity;
+  severity: SmartNotificationSeverity;
+  category: SmartNotificationCategory;
   modeTarget?: TravelerModeId;
   dismissed: boolean;
+  read: boolean;
+  readAt?: string;
   createdAt: string;
 };
 
@@ -332,4 +443,5 @@ export type FeatureFlags = {
   voiceGuidance: boolean;
   adminConfig: boolean;
   flightModule: boolean;
+  aiRecommendations: boolean;
 };

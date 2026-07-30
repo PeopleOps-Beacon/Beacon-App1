@@ -1,10 +1,52 @@
-node_modules
-dist
-.env
-.env.local
-coverage
+# Dependencies
+node_modules/
+
+# Build output and generated caches
+dist/
+build/
+coverage/
+.vite/
+.cache/
+.parcel-cache/
+.turbo/
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
 vitest.config.js
 vitest.config.d.ts
+
+# Environment variables and local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Credentials, certificates, and local databases
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs and runtime artifacts
+*.log
+logs/
+firebase-debug.log*
+
+# IDE, OS, and tool-local files
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+.firebase/
+.claude/settings.local.json
+.codex-checkpoints/
+.codex-preview*.log
+
+# Local exports and transfer archives
+*.zip

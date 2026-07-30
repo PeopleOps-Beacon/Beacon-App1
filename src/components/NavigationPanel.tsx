@@ -16,7 +16,7 @@ export function NavigationPanel({ navigation, mode, onArrive }: Props) {
       <section className="navigation-panel" aria-label="Navigation guidance">
         <Navigation aria-hidden="true" />
         <h2>Route waiting</h2>
-        <p>Choose a destination to start mock navigation.</p>
+        <p>Choose a destination to start navigation.</p>
       </section>
     );
   }
@@ -35,7 +35,7 @@ export function NavigationPanel({ navigation, mode, onArrive }: Props) {
       <div className="panel-heading">
         <Navigation aria-hidden="true" />
         <div>
-          <p className="eyebrow">Mock Navigation</p>
+          <p className="eyebrow">Navigation</p>
           <h2 id="navigation-title">Route to {route.to.name}</h2>
         </div>
       </div>

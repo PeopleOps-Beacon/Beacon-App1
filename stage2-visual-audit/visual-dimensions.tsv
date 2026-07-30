@@ -1,0 +1,39 @@
+visual_id	title	path	width	height	overlay	overlay_position
+main-entrance	Main Entrance	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-main-entrance-close.webp	1448	1086	straight	top-center
+main-entrance-ticketing	Main Entrance to Ticketing	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-main-entrance-ticketing-check-in.webp	1448	1086	straight	top-center
+ticket-counter	Ticketing Area	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-ticket-counter.webp	1448	1086	straight	top-center
+delta-check-in	Delta Air Lines Check In	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-delta-check-in.webp	1448	1086	straight	top-center
+american-check-in	American Airlines Check In	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-american-check-in.webp	1448	1086	straight	top-center
+united-check-in	United Airlines Check In	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-united-check-in.webp	1448	1086	straight	top-center
+southwest-check-in	Southwest Airlines Check In	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-southwest-check-in.webp	1448	1086	straight	top-center
+security-checkpoint	Security Checkpoint	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-security-checkpoint.webp	1448	1086	straight	top-center
+security-standard	Standard Security	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-security-standard.webp	1448	1086	straight	top-center
+security-exit	Security Exit	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-security-concourse-exit.webp	1448	1086	straight	top-center
+post-security-concourse	Post-Security Concourse	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-security-concourse-exit.webp	1448	1086	straight	top-center
+tsa-precheck	TSA PreCheck Entrance	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-tsa-precheck.webp	1448	1086	enter-left	top-left
+information-desk	Information Desk	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-information-desk-right-turn.webp	1448	1086	straight	top-center
+information-desk-approach	Aviator Boy Fountain	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\gsp\landmarks\gsp-aviator-boy-media.webp	1448	1086	straight	top-center
+information-desk-right-turn	Information Desk	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-information-desk-right-turn.webp	1448	1086	right	top-center
+elevator	Elevator Bank	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-elevator.webp	1448	1086	straight	top-center
+elevator-left	Elevator on the Left	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-elevator-left.webp	1448	1086	landmark-left	top-center
+elevator-right	Elevator on the Right	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-elevator-right.webp	1448	1086	landmark-right	top-center
+escalator	Escalator	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-escalator.webp	1448	1086	straight	top-center
+restroom	Restroom Entrance	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-restroom.webp	1448	1086	landmark-right	top-center
+accessible-restroom	Accessible Restroom	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-accessible-restroom.webp	1448	1086	landmark-right	top-center
+family-restroom	Family Restroom	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-family-restroom.webp	1448	1086	landmark-left	top-center
+quiet-space	Quiet Space	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-quiet-space.webp	1448	1086	straight	middle-left
+concourse-split	Concourse Split	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-concourse-split.webp	1448	1086	left	top-center
+concourse-a-entrance	Concourse A Entrance	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-concourse-a-entrance.webp	1448	1086	straight	top-center
+concourse-b-entrance	Concourse B Entrance	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-concourse-b-entrance.webp	1448	1086	straight	top-center
+coffee-shop	Coffee Shop Landmark	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-coffee-shop.webp	1448	1086	landmark-left	top-center
+gate-area	Gate Podium	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-gate-podium.webp	1448	1086	arrive	top-center
+gate-a1-podium	Gate A1	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-gate-podium.webp	1448	1086	arrive	top-center
+gate-a12-podium	Gate A12	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-gate-podium.webp	1448	1086	arrive	top-center
+gate-b6-podium	Gate B6	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-gate-podium.webp	1448	1086	arrive	top-center
+gate-seating	Gate Seating Area	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-gate-seating-route.webp	1448	1086	straight	top-center
+baggage-claim	Baggage Claim	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-baggage-claim.webp	1448	1086	straight	top-center
+ground-transportation	Ground Transportation	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-ground-transportation-exit.webp	1448	1086	straight	top-center
+parking-connection	Parking Connection	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-parking-connection.webp	1448	1086	straight	top-center
+airport-assistance-desk	Airport Assistance Desk	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-airport-assistance-desk.webp	1448	1086	landmark-right	top-center
+service-animal-relief	Service Animal Relief Area	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-service-animal-relief.webp	1448	1086	landmark-left	top-center
+rental-car-area	Rental Car Area	C:\Users\Owner\OneDrive\Documents\Beacon-OS\src\assets\simulated\simulated-rental-car-area.webp	1448	1086	straight	top-center
